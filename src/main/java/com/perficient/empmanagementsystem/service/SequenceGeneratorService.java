@@ -10,12 +10,13 @@ import com.perficient.empmanagementsystem.model.DatabaseSequence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 
-@Service
+@Component
 public class SequenceGeneratorService {
 
+    @Autowired
     private MongoOperations mongoOperations;
 
     @Autowired
