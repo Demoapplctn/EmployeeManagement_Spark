@@ -21,7 +21,7 @@ public class Employee {
     private String firstName;
     private String lastName;
     private String email;
-    private int contactNo;
+    private long contactNo;
     private Address address;
 
 }
