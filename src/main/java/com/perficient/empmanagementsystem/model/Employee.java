@@ -1,6 +1,8 @@
 package com.perficient.empmanagementsystem.model;
 
 import lombok.*;
+
+import javax.annotation.Generated;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -21,6 +23,7 @@ public class Employee {
     private String firstName;
     private String lastName;
     private String email;
+    private String password;
     private long contactNo;
     private Address address;
 

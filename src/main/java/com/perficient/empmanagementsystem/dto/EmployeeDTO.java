@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Builder
 public class EmployeeDTO {
+	
     private Long empId;
     @NotNull
     private String firstName;
@@ -18,6 +19,11 @@ public class EmployeeDTO {
     private String lastName;
     @NotNull
     private String email;
+    
+    @NotNull
+    private String password;
+    @NotNull
     private long contactNo;
+    @NotNull
     private Address address;
 }
