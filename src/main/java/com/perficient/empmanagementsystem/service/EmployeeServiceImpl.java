@@ -15,7 +15,7 @@ public class EmployeeServiceImpl implements EmployeeService{
     @Autowired
     private EmployeeRepository employeeRepository;
     @Override
-    public Employee employeeRegistration(EmployeeDTO employeeDTO) {
+    public Employee employeeRegistration(EmployeeDTO employeeDTO) throws Exception{
         log.debug("[employeeRegistration] start service");
         Address address =Address.builder()
                 .city(employeeDTO.getAddress().getCity())
@@ -29,9 +29,9 @@ public class EmployeeServiceImpl implements EmployeeService{
                 .contactNo(employeeDTO.getContactNo())
                 .empId(employeeDTO.getEmpId())
                 .address(address)
+                .password(employeeDTO.getPassword())
+                .admin(employeeDTO.isAdmin())
                 .build();
         return employeeRepository.save(employee);
-
-
     }
 }
