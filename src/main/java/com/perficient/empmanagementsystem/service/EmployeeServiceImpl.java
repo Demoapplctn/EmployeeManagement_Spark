@@ -1,5 +1,6 @@
 package com.perficient.empmanagementsystem.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,17 +55,21 @@ public class EmployeeServiceImpl implements EmployeeService{
 	
 	@Override
 	public String verifyLoginPage(LoginPageDTO loginPageDTO) {//passwordverification
-
-		 if(loginPageDTO.getPassword().contentEquals(findByEmail(loginPageDTO)))
-			return "ok";	
+		if(findAllForEmail().contains(loginPageDTO.getEmail()))
+		 if (loginPageDTO.getPassword().contentEquals(findByEmail(loginPageDTO)))
+			return "username and password matches";	
 			else	
-			return "not ok";
-									
+			return "username and password doesnot match";
+		return "email does not exist";
+			
+		
+		
 	}
 	
 	
 	@Override
 	public String findByEmail(LoginPageDTO loginPageDTO) {//retreiving password from db for given email
+		if(findAllForEmail().contains(loginPageDTO.getEmail())) {
 		List<EmployeeDTO> value  = employeeRepository.findPasswordByEmail(loginPageDTO.getEmail()); 
 		Map<String,String> myMap = new  HashMap<String,String>();
 		for(EmployeeDTO employeeDTO : value)
@@ -72,9 +77,28 @@ public class EmployeeServiceImpl implements EmployeeService{
 		String Password = myMap.get(loginPageDTO.getEmail());
 		
 		return Password;
-		
+		}
+		return "email id does not exit";
 		
 	}
+
+	@Override
+	public List<String> findAllForEmail() {
+		
+		 List<Employee> email = employeeRepository.findALLEmail();
+		 
+		 Map<String,String> myMap1 = new HashMap<String,String>();
+		 for( Employee employee : email)
+			 myMap1.put(employee.getFirstName(), employee.getEmail());
+		 System.out.println(myMap1);
+		 List<String> result = new ArrayList(myMap1.values());
+		 return result;
+		
+	}
+	
+	
+	
+	
 	}
 	
 	

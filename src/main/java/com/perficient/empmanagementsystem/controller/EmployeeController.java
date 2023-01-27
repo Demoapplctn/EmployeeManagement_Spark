@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 @CrossOrigin("*")
@@ -50,5 +52,9 @@ public class EmployeeController {
        return  ResponseEntity.status(HttpStatus.OK).body(employeeService.verifyLoginPage(loginPageDTO));
     }
     
-
+    @GetMapping("/findAllEmail")//get all email
+    public ResponseEntity<List<String>> findAllForEmail(){
+    	
+       return  ResponseEntity.status(HttpStatus.OK).body(employeeService.findAllForEmail());
+    }
 }
