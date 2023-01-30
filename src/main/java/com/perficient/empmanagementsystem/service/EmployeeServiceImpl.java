@@ -1,12 +1,15 @@
 package com.perficient.empmanagementsystem.service;
 
+import com.mongodb.spark.MongoSpark;
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.model.Address;
 import com.perficient.empmanagementsystem.model.Employee;
 import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.spark.sql.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.spark.api.java.JavaSparkContext;
 
 @Service
 @Slf4j
@@ -34,4 +37,24 @@ public class EmployeeServiceImpl implements EmployeeService{
                 .build();
         return employeeRepository.save(employee);
     }
+
+    @Override
+    public String UploadEmployeeRegistration(String path) {
+
+        SparkSession spark = SparkSession.builder().master("local[1]")
+                .getOrCreate();
+
+        Dataset<Row> csv =  spark.read().format("csv").option("header","true").load(path);
+
+        JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
+
+        csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource").option("spark.mongodb.input.uri", "mongodb://127.0.0.1/")
+                .option("spark.mongodb.output.uri", "mongodb://127.0.0.1/")
+                .option("database", "EmployeeDB")
+                .option("collection", "Employee")
+                .save();
+        jsc.close();
+        return "File Saved successfully";
+    }
+
 }
