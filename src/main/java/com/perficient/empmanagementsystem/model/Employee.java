@@ -1,6 +1,8 @@
 package com.perficient.empmanagementsystem.model;
 
 import lombok.*;
+
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
@@ -14,6 +16,7 @@ public class Employee {
     private String firstName;
     private String lastName;
     private String email;
+    
     private long contactNo;
     private Address address;
     private String password;

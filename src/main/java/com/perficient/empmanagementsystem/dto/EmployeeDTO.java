@@ -14,7 +14,9 @@ import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
 @AllArgsConstructor
 @Builder
 public class EmployeeDTO {
+
     @NotNull(message = PROVIDE_EMP_ID)
+
     private Long empId;
     @NotNull(message = PROVIDE_FIRSTNAME)
     private String firstName;
@@ -23,7 +25,11 @@ public class EmployeeDTO {
     @NotNull(message = PROVIDE_EMAIL)
     @Email
     private String email;
+    
+    
+    @NotNull
     private long contactNo;
+    @NotNull
     private Address address;
 
     @NotNull(message = PROVIDE_PASSWORD)
