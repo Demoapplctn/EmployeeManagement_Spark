@@ -25,6 +25,8 @@ import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
+
 
 @Service
 @Slf4j
@@ -59,9 +61,8 @@ public class EmployeeServiceImpl implements EmployeeService{
     
 	@Override
 	public String employeeRegistrationDeleteAll() {//deleteall
-		// TODO Auto-generated method stub
 		employeeRepository.deleteAll();
-		return "sucess";
+		return DELETE_ALL_RECORD;
 	}
 	
 	
@@ -70,14 +71,14 @@ public class EmployeeServiceImpl implements EmployeeService{
 	public String verifyLoginPage(LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException, loginPageErrorException{//passwordverification
 		
 		if(loginPageDTO.getEmail().isBlank()) 
-			return "email id cannot be empty";
+			return EMAIL_ID_CANNOT_BE_EMPTY;
 		
 		if(findAllForEmail().contains(loginPageDTO.getEmail()))
 		 if (loginPageDTO.getPassword().contentEquals(findByEmail(loginPageDTO)))
-			return "username and password matches";	
+			return USERNAME_AND_PASSWORD_MATCHES;
 			else	
-				throw new loginPageErrorException("entered email and password doesnot match pls provide correct details.");
-		throw new inCorrectEmailErrorException("Pls enter the correct email for further process:");
+				throw new loginPageErrorException(PROVIDE_CORRECT_EMAIL_PASSWORD);
+		throw new inCorrectEmailErrorException(PROVIDE_CORRECT_EMAIL);
 		
 		
 	}
@@ -94,7 +95,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 		
 		return Password;
 		}
-		throw new inCorrectEmailErrorException("given email doesnot present in the data base pls enter correct email");
+		throw new inCorrectEmailErrorException(GIVEN_EMAIL_DOES_NOT_PRESENT);
 		
 	}
 
@@ -119,7 +120,6 @@ public class EmployeeServiceImpl implements EmployeeService{
                 .getOrCreate();
 
         Dataset<Row> csv =  spark.read().format("csv").option("header","true").load(path);
-
         JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
 
         csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource").option("spark.mongodb.input.uri", "mongodb://127.0.0.1/")
