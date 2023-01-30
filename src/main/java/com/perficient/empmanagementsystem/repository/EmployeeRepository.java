@@ -16,6 +16,8 @@ public interface EmployeeRepository extends MongoRepository<Employee, Long> {
 	
 	@Query(value = "{}",fields = "{empId:0}")
 	List<Employee> findALLEmail();
+	
+	Employee findByEmpId(Long empId);
 
 	
 }

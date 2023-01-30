@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
+import com.perficient.empmanagementsystem.exception.ResourceNotFoundException;
 import com.perficient.empmanagementsystem.exception.inCorrectEmailErrorException;
 import com.perficient.empmanagementsystem.exception.loginPageErrorException;
 import com.perficient.empmanagementsystem.model.Address;
@@ -129,6 +130,16 @@ public class EmployeeServiceImpl implements EmployeeService{
         jsc.close();
         return "File Saved successfully";
     }
+
+
+	@Override
+	public Employee loadById(Long empId) throws ResourceNotFoundException {
+		Employee employee = employeeRepository.findByEmpId(empId);
+		if(employee == null) {
+			throw new ResourceNotFoundException();
+		} 
+		return employee;
+	}
 
 }
 

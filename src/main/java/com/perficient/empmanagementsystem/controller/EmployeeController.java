@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
+import com.perficient.empmanagementsystem.exception.ResourceNotFoundException;
 import com.perficient.empmanagementsystem.exception.inCorrectEmailErrorException;
 import com.perficient.empmanagementsystem.exception.loginPageErrorException;
 import com.perficient.empmanagementsystem.model.Employee;
@@ -73,6 +75,11 @@ public class EmployeeController {
         employeeService.UploadEmployeeRegistration(path);
         return  ResponseEntity.status(HttpStatus.OK).body("File Uploaded Successfully");
     }
-
+    
+    @GetMapping("/loadById/{empId}")
+    public ResponseEntity<Employee> loadByEmpId(@PathVariable long empId) throws ResourceNotFoundException{
+		return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadById(empId));
+    	
+    }
 
 }
