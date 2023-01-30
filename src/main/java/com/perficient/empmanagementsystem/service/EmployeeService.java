@@ -5,4 +5,6 @@ import com.perficient.empmanagementsystem.model.Employee;
 
 public interface EmployeeService {
     public Employee employeeRegistration(EmployeeDTO employeeDTO)throws Exception;
+
+    public String UploadEmployeeRegistration(String path);
 }
