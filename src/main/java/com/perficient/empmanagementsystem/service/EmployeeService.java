@@ -9,11 +9,14 @@ import com.perficient.empmanagementsystem.exception.loginPageErrorException;
 import com.perficient.empmanagementsystem.model.Employee;
 
 public interface EmployeeService {
+
 	public Employee employeeRegistration(EmployeeDTO employeeDTO)throws Exception;
+	public String UploadEmployeeRegistration(String path);
     public String employeeRegistrationDeleteAll();//deleting all entries
     public String findByEmail(LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException;//finding password from database for already registered user
     public String verifyLoginPage(LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException, loginPageErrorException;//Verifying password 
     public List<String> findAllForEmail();//finding all email list
     
+
 
 }
