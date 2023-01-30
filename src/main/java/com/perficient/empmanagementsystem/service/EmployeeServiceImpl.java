@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
+import com.perficient.empmanagementsystem.exception.inCorrectEmailErrorException;
+import com.perficient.empmanagementsystem.exception.loginPageErrorException;
 import com.perficient.empmanagementsystem.model.Address;
 import com.perficient.empmanagementsystem.model.Employee;
 import com.perficient.empmanagementsystem.repository.EmployeeRepository;
@@ -56,21 +58,24 @@ public class EmployeeServiceImpl implements EmployeeService{
 	
 	
 	@Override
-	public String verifyLoginPage(LoginPageDTO loginPageDTO) {//passwordverification
+	public String verifyLoginPage(LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException, loginPageErrorException{//passwordverification
+		
+		if(loginPageDTO.getEmail().isBlank()) 
+			return "email id cannot be empty";
+		
 		if(findAllForEmail().contains(loginPageDTO.getEmail()))
 		 if (loginPageDTO.getPassword().contentEquals(findByEmail(loginPageDTO)))
 			return "username and password matches";	
 			else	
-			return "username and password doesnot match";
-		return "email does not exist";
-			
+				throw new loginPageErrorException("entered email and password doesnot match pls provide correct details.");
+		throw new inCorrectEmailErrorException("Pls enter the correct email for further process:");
 		
 		
 	}
 	
 	
 	@Override
-	public String findByEmail(LoginPageDTO loginPageDTO) {//retreiving password from db for given email
+	public String findByEmail(LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException {//retreiving password from db for given email
 		if(findAllForEmail().contains(loginPageDTO.getEmail())) {
 		List<EmployeeDTO> value  = employeeRepository.findPasswordByEmail(loginPageDTO.getEmail()); 
 		Map<String,String> myMap = new  HashMap<String,String>();
@@ -80,7 +85,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 		
 		return Password;
 		}
-		return "email id does not exit";
+		throw new inCorrectEmailErrorException("given email doesnot present in the data base pls enter correct email");
 		
 	}
 

@@ -2,6 +2,8 @@ package com.perficient.empmanagementsystem.controller;
 
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
+import com.perficient.empmanagementsystem.exception.inCorrectEmailErrorException;
+import com.perficient.empmanagementsystem.exception.loginPageErrorException;
 import com.perficient.empmanagementsystem.model.Employee;
 import com.perficient.empmanagementsystem.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +28,7 @@ public class EmployeeController {
 
     @PostMapping(value = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> employeeRegistration(@Valid @RequestBody EmployeeDTO employeeDTO)throws Exception{
-
         log.debug("[employeeRegistration] Begin");
-
         return  ResponseEntity.status(HttpStatus.CREATED).body(employeeService.employeeRegistration(employeeDTO));
     }
     
@@ -37,21 +37,18 @@ public class EmployeeController {
         return  ResponseEntity.status(HttpStatus.OK).body(employeeService.employeeRegistrationDeleteAll());
     }
     
-    @GetMapping("/emailandPassword")//retrieving password for the given email from data base
-    public ResponseEntity<String>findbyEmail(@RequestBody LoginPageDTO loginPageDTO){
-    	
-        return  ResponseEntity.status(HttpStatus.OK).body(employeeService.findByEmail(loginPageDTO));
-    }
+    //@GetMapping("/emailandPassword")//retrieving password for the given email from data base
+    //public ResponseEntity<String>findbyEmail(@RequestBody LoginPageDTO loginPageDTO) throws loginPageErrorException{
+       // return  ResponseEntity.status(HttpStatus.OK).body(employeeService.findByEmail(loginPageDTO));
+    //}
     
     @GetMapping("/loginPageVerify")//verify the password
-    public ResponseEntity<String> loginPageVerify(@RequestBody LoginPageDTO loginPageDTO){
-    	
+    public ResponseEntity<String> loginPageVerify(@RequestBody LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException, loginPageErrorException{
        return  ResponseEntity.status(HttpStatus.OK).body(employeeService.verifyLoginPage(loginPageDTO));
     }
     
-    @GetMapping("/findAllEmail")//get all email
-    public ResponseEntity<List<String>> findAllForEmail(){
-    	
-       return  ResponseEntity.status(HttpStatus.OK).body(employeeService.findAllForEmail());
-    }
+    //@GetMapping("/findAllEmail")//get all email
+    //public ResponseEntity<List<String>> findAllForEmail(){
+      // return  ResponseEntity.status(HttpStatus.OK).body(employeeService.findAllForEmail());
+    //}
 }
