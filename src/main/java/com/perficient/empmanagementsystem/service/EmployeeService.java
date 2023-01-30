@@ -7,10 +7,11 @@ import com.perficient.empmanagementsystem.dto.LoginPageDTO;
 import com.perficient.empmanagementsystem.model.Employee;
 
 public interface EmployeeService {
-    public Employee employeeRegistration(EmployeeDTO employeeDTO);
+	public Employee employeeRegistration(EmployeeDTO employeeDTO)throws Exception;
     public String employeeRegistrationDeleteAll();//deleting all entries
     public String findByEmail(LoginPageDTO loginPageDTO);//finding password from database for already registered user
     public String verifyLoginPage(LoginPageDTO loginPageDTO);//Verifying password 
     public List<String> findAllForEmail();
     
+
 }

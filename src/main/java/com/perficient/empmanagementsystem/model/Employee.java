@@ -2,10 +2,7 @@ package com.perficient.empmanagementsystem.model;
 
 import lombok.*;
 
-import javax.annotation.Generated;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.index.Indexed;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
@@ -15,16 +12,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @Document(collection = "Employee")
 public class Employee {
-    @Transient
-    public static final String SEQUENCE_NAME = "users_sequence";
-
-    @Id
     private Long empId;
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
+    
     private long contactNo;
     private Address address;
+    private String password;
+    private boolean admin;
+
 
 }
