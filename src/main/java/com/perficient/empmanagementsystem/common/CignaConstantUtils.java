@@ -8,6 +8,10 @@ public class CignaConstantUtils {
     public static final String PROVIDE_EMAIL="Please provide email";
     public static final String PROVIDE_PASSWORD="Please provide password";
     public static final String PROVIDE_CORRECT_EMAIL="Pls enter the correct email for further process:";
-    public static final String PROVIDE_CORRECT_EMAIL_PASSWORD="entered email and password doesnot match pls provide correct details.";
+    public static final String PROVIDE_CORRECT_EMAIL_PASSWORD="entered email and password does not match pls provide correct details.";
+    public static final String GIVEN_EMAIL_DOES_NOT_PRESENT="given email does not present in the data base pls enter correct email";
     public static final String PROVIDE_CORRECT_ID="Employee Not found with this Id";
+    public static final String EMAIL_ID_CANNOT_BE_EMPTY="email id cannot be empty";
+    public static final String USERNAME_AND_PASSWORD_MATCHES="username and password matches";
+    public static final String DELETE_ALL_RECORD="delete all record successfully";
 }
