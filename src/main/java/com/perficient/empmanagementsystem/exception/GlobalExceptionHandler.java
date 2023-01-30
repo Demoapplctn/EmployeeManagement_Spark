@@ -51,4 +51,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     	return new ResponseEntity<Object>(response,HttpStatus.NOT_FOUND);
     	
     }
+    
+    @ExceptionHandler(value = ResourceNotFoundException.class)
+    private ResponseEntity<Object> exception(ResourceNotFoundException resourceNotFoundException){
+    	
+    	ErrorDetails result = getErrorDetail(ErrorCodeEnum.INPUT_EMPID_ERROR.getMessages(), ErrorCodeEnum.INPUT_EMPID_ERROR.getCode());
+    	
+    	return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
+    }
 }
