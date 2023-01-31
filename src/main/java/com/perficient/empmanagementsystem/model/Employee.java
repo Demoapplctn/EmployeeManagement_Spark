@@ -6,13 +6,16 @@ import lombok.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Document(collection = "employee")
-public class Employee {
+public class Employee implements Serializable {
+    private static final long serialVersionUID = -7533904418009115422L;
     @Indexed(unique = true)
     private Long empId;
     private String firstName;

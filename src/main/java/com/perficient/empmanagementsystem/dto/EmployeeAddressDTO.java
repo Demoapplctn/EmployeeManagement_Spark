@@ -4,18 +4,21 @@ import javax.validation.constraints.NotNull;
 
 import lombok.*;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmployeeAddressDTO {
-
+public class EmployeeAddressDTO implements Serializable {
+    private static final long serialVersionUID = -4318539983594519076L;
+    @NotNull
     private String address;
-	@NotNull
+    @NotNull
     private String city;
-	@NotNull
+    @NotNull
     private String state;
-	@NotNull
+    @NotNull
     private String zipcode;
 }
