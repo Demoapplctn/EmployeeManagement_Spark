@@ -16,7 +16,7 @@ public interface EmployeeRepository extends MongoRepository<Employee, Long> {
 	
 	List<Employee> findByEmailStartingWith(String regexp);
 	
-	Employee findByEmpId(Long empId);
+	Employee findByEmail(String email);
 
 	
 }
