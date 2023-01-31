@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
-import com.perficient.empmanagementsystem.exception.ResourceNotFoundException;
+import com.perficient.empmanagementsystem.exception.EmployeeNotFoundException;
 import com.perficient.empmanagementsystem.exception.inCorrectEmailErrorException;
 import com.perficient.empmanagementsystem.exception.loginPageErrorException;
 import com.perficient.empmanagementsystem.model.Employee;
@@ -42,8 +42,6 @@ public class EmployeeController {
     @Value("${file.upload-dir}")
     String FILE_DIRECTORY;
 
-
-
     @PostMapping(value = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> employeeRegistration(@Valid @RequestBody EmployeeDTO employeeDTO)throws Exception{
         log.debug("[employeeRegistration] Begin");
@@ -54,13 +52,11 @@ public class EmployeeController {
     public ResponseEntity<String> DeleteEmployeeRegistration(){
         return  ResponseEntity.status(HttpStatus.OK).body(employeeService.employeeRegistrationDeleteAll());
     }
-    
- 
-    @GetMapping("/loginPageVerify")//verify the password
+
+    @PostMapping("/loginPageVerify")//verify the password
     public ResponseEntity<String> loginPageVerify(@RequestBody LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException, loginPageErrorException{
        return  ResponseEntity.status(HttpStatus.OK).body(employeeService.verifyLoginPage(loginPageDTO));
     }
-    
  
     @PostMapping(value="/uploadFile", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> fileUpload(@RequestParam("File") MultipartFile file) throws IOException {
@@ -77,7 +73,8 @@ public class EmployeeController {
     }
     
     @GetMapping("/loadById/{empId}")
-    public ResponseEntity<Employee> loadByEmpId(@PathVariable long empId) throws ResourceNotFoundException{
+    public ResponseEntity<Employee> loadByEmpId(@PathVariable long empId) throws EmployeeNotFoundException {
+        log.debug("loadByEmpId Begin");
 		return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadById(empId));
     	
     }

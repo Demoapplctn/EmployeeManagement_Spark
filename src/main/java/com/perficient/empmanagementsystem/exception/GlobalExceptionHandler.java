@@ -17,8 +17,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
-
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus
             status, WebRequest request) {
@@ -52,8 +50,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     	
     }
     
-    @ExceptionHandler(value = ResourceNotFoundException.class)
-    private ResponseEntity<Object> exception(ResourceNotFoundException resourceNotFoundException){
+    @ExceptionHandler(value = EmployeeNotFoundException.class)
+    private ResponseEntity<Object> exception(EmployeeNotFoundException employeeNotFoundException){
     	
     	ErrorDetails result = getErrorDetail(ErrorCodeEnum.INPUT_EMPID_ERROR.getMessages(), ErrorCodeEnum.INPUT_EMPID_ERROR.getCode());
     	

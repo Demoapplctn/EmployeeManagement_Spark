@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EmployeeRepository extends MongoRepository<Employee, Long> {
-	
 	@Query(value="{'email': ?0}",fields = "{empId:0}")
 	List<EmployeeDTO> findPasswordByEmail(String email);
 	

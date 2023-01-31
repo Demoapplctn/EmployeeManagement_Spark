@@ -1,6 +1,6 @@
 package com.perficient.empmanagementsystem.dto;
 
-import com.perficient.empmanagementsystem.model.Address;
+import com.perficient.empmanagementsystem.model.EmployeeAddress;
 import lombok.*;
 
 import javax.validation.constraints.Email;
@@ -25,12 +25,10 @@ public class EmployeeDTO {
     @NotNull(message = PROVIDE_EMAIL)
     @Email
     private String email;
-    
-    
     @NotNull
     private long contactNo;
     @NotNull
-    private Address address;
+    private EmployeeAddress employeeAddress;
 
     @NotNull(message = PROVIDE_PASSWORD)
     private String password;
