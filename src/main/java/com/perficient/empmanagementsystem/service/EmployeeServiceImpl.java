@@ -1,12 +1,14 @@
 package com.perficient.empmanagementsystem.service;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 import java.util.zip.DataFormatException;
 
+import com.opencsv.CSVReader;
+import com.perficient.empmanagementsystem.common.CignaConstantUtils;
 import com.perficient.empmanagementsystem.exception.DuplicateEntryException;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
@@ -82,8 +84,10 @@ public class EmployeeServiceImpl implements EmployeeService{
 	@Override
 	public String verifyLoginPage(LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException {//passwordverification
 		
+
 		log.info("given email id :"+ loginPageDTO.getEmail());
-		if(loginPageDTO.getEmail().isBlank()) 
+		 
+		if(loginPageDTO.getEmail().isEmpty())
 			return EMAIL_ID_CANNOT_BE_EMPTY;
 		
 		if(findAllForEmail(loginPageDTO).contains(loginPageDTO.getEmail()))
@@ -135,23 +139,64 @@ public class EmployeeServiceImpl implements EmployeeService{
 		
 	}
 
-    @Override
-    public String UploadEmployeeRegistration(String path) {
+	@Override
+	public String UploadEmployeeRegistration(File myFile) throws Exception {
+		if (validateFileHeader(myFile)) {
+			String path = String.valueOf(myFile.getAbsoluteFile());
+			SparkSession spark = SparkSession.builder().master("local[1]")
+					.getOrCreate();
 
-        SparkSession spark = SparkSession.builder().master("local[1]")
-                .getOrCreate();
+			Dataset<Row> csv = spark.read().format("csv").option("header", "true").load(path);
 
-        Dataset<Row> csv =  spark.read().format("csv").option("header","true").load(path);
-        JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
+			JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
 
-        csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource").option("spark.mongodb.input.uri", "mongodb://127.0.0.1/")
-                .option("spark.mongodb.output.uri", "mongodb://127.0.0.1/")
-                .option("database", "EmployeeDB")
-                .option("collection", "Employee")
-                .save();
-        jsc.close();
-        return "File Saved successfully";
-    }
+			csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource").option("spark.mongodb.input.uri", "mongodb://127.0.0.1/")
+					.option("spark.mongodb.output.uri", "mongodb://127.0.0.1/")
+					.option("database", "EmployeeDB")
+					.option("collection", "Employee")
+					.save();
+			jsc.close();
+			return CignaConstantUtils.UPLOAD_SUCCESS_MESSAGE;
+		} else {
+			return CignaConstantUtils.HEADER_MISMATCH;
+		}
+	}
+
+
+	private boolean validateFileHeader(File file) throws IOException {
+
+		CSVReader reader = new CSVReader(new FileReader(file));
+		String[] header = reader.readNext();
+		List<String> headerList = new ArrayList<>();
+		for (String result : header) {
+			headerList.add(result);
+		}
+		Map<String, String> fileHeaderMap = buildFileHeader();
+		if (header.length == fileHeaderMap.size()) {
+			if (fileHeaderMap.keySet().containsAll(headerList)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		return false;
+	}
+
+	private Map<String, String> buildFileHeader() {
+
+		Map<String, String> fileHeaderMap = new LinkedHashMap<>();
+		fileHeaderMap.put("empId", "EMP_ID");
+		fileHeaderMap.put("firstName", "FIRST_NAME");
+		fileHeaderMap.put("lastName", "LAST_NAME");
+		fileHeaderMap.put("email", "EMAIL");
+		fileHeaderMap.put("contactNo", "contactNo");
+		fileHeaderMap.put("address", "ADDRESS");
+		fileHeaderMap.put("password", "PASSWORD");
+		fileHeaderMap.put("admin", "ADMIN");
+
+		return fileHeaderMap;
+	}
 
 	@Override
 	public Employee loadById(Long empId) throws EmployeeNotFoundException {

@@ -15,4 +15,11 @@ public class CignaConstantUtils {
     public static final String USERNAME_AND_PASSWORD_MATCHES="username and password matches";
     public static final String DELETE_ALL_RECORD="delete all record successfully";
     public static final String EMPLOYEE_EMAIL_EXIST="EmployeeId or Email is already exist";
+
+    public static final String PROVIDE_FILE="File is not present";
+
+    public static final String UPLOAD_SUCCESS_MESSAGE="File Uploaded successfully";
+    public static final String FILE_FORMAT="CSV";
+    public static final String FILE_FORMAT_ERROR="Please upload csv file to process";
+    public static final String HEADER_MISMATCH="Headers mismatch";
 }
