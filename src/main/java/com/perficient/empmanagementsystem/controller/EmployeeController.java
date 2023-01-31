@@ -59,7 +59,7 @@ public class EmployeeController {
     }
  
     @PostMapping(value="/uploadFile", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> fileUpload(@RequestParam("File") MultipartFile file) throws IOException {
+    public ResponseEntity<Object> fileUpload(@Valid @RequestParam MultipartFile file) throws IOException {
         log.debug("Uploading file Begin");
         File myFile = new File(FILE_DIRECTORY+file.getOriginalFilename());
         myFile.createNewFile();
