@@ -13,8 +13,8 @@ public interface EmployeeRepository extends MongoRepository<Employee, Long> {
 	@Query(value="{'email': ?0}",fields = "{empId:0}")
 	List<EmployeeDTO> findPasswordByEmail(String email);
 	
-	@Query(value = "{}",fields = "{empId:0}")
-	List<Employee> findALLEmail();
+	
+	List<Employee> findByEmailStartingWith(String regexp);
 	
 	Employee findByEmpId(Long empId);
 

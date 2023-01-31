@@ -82,10 +82,11 @@ public class EmployeeServiceImpl implements EmployeeService{
 	@Override
 	public String verifyLoginPage(LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException {//passwordverification
 		
+		log.info("given email id :"+ loginPageDTO.getEmail());
 		if(loginPageDTO.getEmail().isBlank()) 
 			return EMAIL_ID_CANNOT_BE_EMPTY;
 		
-		if(findAllForEmail().contains(loginPageDTO.getEmail()))
+		if(findAllForEmail(loginPageDTO).contains(loginPageDTO.getEmail()))
 		 if (loginPageDTO.getPassword().contentEquals(findByEmail(loginPageDTO)))
 			return USERNAME_AND_PASSWORD_MATCHES;
 			else	
@@ -98,8 +99,13 @@ public class EmployeeServiceImpl implements EmployeeService{
 	
 	@Override
 	public String findByEmail(LoginPageDTO loginPageDTO) throws InCorrectEmailException {//retreiving password from db for given email
-		if(findAllForEmail().contains(loginPageDTO.getEmail())) {
+		
+		log.info("given email id :"+ loginPageDTO.getEmail());
+		
+		if(findAllForEmail(loginPageDTO).contains(loginPageDTO.getEmail())) {
 		List<EmployeeDTO> value  = employeeRepository.findPasswordByEmail(loginPageDTO.getEmail()); 
+		log.debug("password for the mail id:" + loginPageDTO.getEmail() + "returned from DB");
+		
 		Map<String,String> myMap = new  HashMap<String,String>();
 		for(EmployeeDTO employeeDTO : value)
 			myMap.put(employeeDTO.getEmail(), employeeDTO.getPassword());
@@ -107,20 +113,24 @@ public class EmployeeServiceImpl implements EmployeeService{
 		
 		return Password;
 		}
+		log.error(GIVEN_EMAIL_DOES_NOT_PRESENT);
 		throw new InCorrectEmailException(GIVEN_EMAIL_DOES_NOT_PRESENT);
 		
 	}
 
 	@Override
-	public List<String> findAllForEmail() {
+	public List<String> findAllForEmail(LoginPageDTO loginPageDTO) {
 		
-		 List<Employee> email = employeeRepository.findALLEmail();
+		String firstLetter = loginPageDTO.getEmail().substring(0, 1);
+		
+		 List<Employee> email = employeeRepository.findByEmailStartingWith(firstLetter);
 		 
 		 Map<String,String> myMap1 = new HashMap<String,String>();
 		 for( Employee employee : email)
 			 myMap1.put(employee.getFirstName(), employee.getEmail());
-		 System.out.println(myMap1);
+		 
 		 List<String> result = new ArrayList(myMap1.values());
+		 log.info("list of email starting with :" + firstLetter + result);
 		 return result;
 		
 	}
