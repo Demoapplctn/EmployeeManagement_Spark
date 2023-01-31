@@ -61,27 +61,20 @@ public class EmployeeController {
     }
 
     @PostMapping(value = "/uploadFile", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> fileUpload(@RequestParam("File") MultipartFile file) throws IOException {
+    public ResponseEntity<Object> fileUpload(@Valid @RequestParam MultipartFile file) throws Exception {
         log.debug("Uploading file Begin");
-        if(CignaConstantUtils.FILE_FORMAT.equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
-            FileOutputStream fos = null;
-            try {
-                File myFile = new File(FILE_DIRECTORY + file.getOriginalFilename());
-                myFile.createNewFile();
-                log.debug("File Created");
-                fos = new FileOutputStream(myFile);
-                fos.write(file.getBytes());
-                return ResponseEntity.status(HttpStatus.OK).body(employeeService.UploadEmployeeRegistration(myFile));
-            } catch (Exception e) {
-//                throw new ResourceNotFoundException(CignaConstantUtils.FILE_FORMAT_ERROR);
-            } finally {
-                fos.close();
-            }
-        }else{
+        if(CignaConstantUtils.FILE_FORMAT.equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename())))
+        {
+            File myFile = new File(FILE_DIRECTORY + file.getOriginalFilename());
+            myFile.createNewFile();
+            log.debug("File Created");
+            FileOutputStream fos = new FileOutputStream(myFile);
+            fos.write(file.getBytes());
+            return ResponseEntity.status(HttpStatus.OK).body(employeeService.UploadEmployeeRegistration(myFile));
+        }
+        else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CignaConstantUtils.FILE_FORMAT_ERROR);
         }
-
-        return null;
     }
     
     @GetMapping("/loadById/{empId}")
