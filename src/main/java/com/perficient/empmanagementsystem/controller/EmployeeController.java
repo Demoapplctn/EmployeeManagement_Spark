@@ -84,10 +84,10 @@ public class EmployeeController {
         return null;
     }
     
-    @GetMapping("/loadById/{empId}")
-    public ResponseEntity<Employee> loadByEmpId(@PathVariable long empId) throws EmployeeNotFoundException {
-        log.debug("loadByEmpId Begin");
-		return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadById(empId));
+    @GetMapping("/loadByEmail/{email}")
+    public ResponseEntity<Employee> loadByEmail(@PathVariable String email) throws EmployeeNotFoundException {
+        log.debug("loadByEmail Begin");
+		return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadByEmail(email));
     	
     }
 

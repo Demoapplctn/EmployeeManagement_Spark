@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.zip.DataFormatException;
 
 import com.opencsv.CSVReader;
 import com.perficient.empmanagementsystem.common.CignaConstantUtils;
@@ -30,8 +29,6 @@ import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
-import static com.perficient.empmanagementsystem.exception.ErrorCodeEnum.EMP_ID_OR_PASSWORD_DUPLICATE;
-
 
 @Service
 @Slf4j
@@ -78,13 +75,9 @@ public class EmployeeServiceImpl implements EmployeeService{
 		employeeRepository.deleteAll();
 		return DELETE_ALL_RECORD;
 	}
-	
-	
-	
+
 	@Override
 	public String verifyLoginPage(LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException {//passwordverification
-		
-
 		log.info("given email id :"+ loginPageDTO.getEmail());
 		 
 		if(loginPageDTO.getEmail().isEmpty())
@@ -96,14 +89,11 @@ public class EmployeeServiceImpl implements EmployeeService{
 			else	
 				throw new LoginPageErrorException(PROVIDE_CORRECT_EMAIL_PASSWORD);
 		throw new InCorrectEmailException(PROVIDE_CORRECT_EMAIL);
-		
-		
+
 	}
-	
-	
+
 	@Override
 	public String findByEmail(LoginPageDTO loginPageDTO) throws InCorrectEmailException {//retreiving password from db for given email
-		
 		log.info("given email id :"+ loginPageDTO.getEmail());
 		
 		if(findAllForEmail(loginPageDTO).contains(loginPageDTO.getEmail())) {
@@ -119,7 +109,6 @@ public class EmployeeServiceImpl implements EmployeeService{
 		}
 		log.error(GIVEN_EMAIL_DOES_NOT_PRESENT);
 		throw new InCorrectEmailException(GIVEN_EMAIL_DOES_NOT_PRESENT);
-		
 	}
 
 	@Override
@@ -162,7 +151,6 @@ public class EmployeeServiceImpl implements EmployeeService{
 		}
 	}
 
-
 	private boolean validateFileHeader(File file) throws IOException {
 
 		CSVReader reader = new CSVReader(new FileReader(file));
@@ -194,14 +182,12 @@ public class EmployeeServiceImpl implements EmployeeService{
 		fileHeaderMap.put("address", "ADDRESS");
 		fileHeaderMap.put("password", "PASSWORD");
 		fileHeaderMap.put("admin", "ADMIN");
-
 		return fileHeaderMap;
 	}
-
 	@Override
-	public Employee loadById(Long empId) throws EmployeeNotFoundException {
+	public Employee loadByEmail(String email) throws EmployeeNotFoundException {
 		log.debug("service loadById begin");
-		Employee employee = employeeRepository.findByEmpId(empId);
+		Employee employee = employeeRepository.findByEmail(email);
 		if(employee == null) {
 			throw new EmployeeNotFoundException(PROVIDE_CORRECT_ID);
 		} 
