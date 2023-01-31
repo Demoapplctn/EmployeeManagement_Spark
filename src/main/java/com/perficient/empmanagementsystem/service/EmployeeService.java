@@ -17,7 +17,7 @@ public interface EmployeeService {
     public String employeeRegistrationDeleteAll();//deleting all entries
     public String findByEmail(LoginPageDTO loginPageDTO) throws InCorrectEmailException;//finding password from database for already registered user
     public String verifyLoginPage(LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException;//Verifying password
-    public List<String> findAllForEmail();//finding all email list
+    public List<String> findAllForEmail(LoginPageDTO loginPageDTO);//finding all email list
     public Employee loadById(Long empId) throws EmployeeNotFoundException;
     
 
