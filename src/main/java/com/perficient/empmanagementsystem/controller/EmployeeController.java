@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import javax.validation.Valid;
 
+import com.perficient.empmanagementsystem.common.CignaConstantUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -57,19 +59,29 @@ public class EmployeeController {
     public ResponseEntity<String> loginPageVerify(@RequestBody LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException {
        return  ResponseEntity.status(HttpStatus.OK).body(employeeService.verifyLoginPage(loginPageDTO));
     }
- 
-    @PostMapping(value="/uploadFile", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> fileUpload(@Valid @RequestParam MultipartFile file) throws IOException {
+
+    @PostMapping(value = "/uploadFile", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> fileUpload(@RequestParam("File") MultipartFile file) throws IOException {
         log.debug("Uploading file Begin");
-        File myFile = new File(FILE_DIRECTORY+file.getOriginalFilename());
-        myFile.createNewFile();
-        log.debug("File Created");
-        FileOutputStream fos =new FileOutputStream(myFile);
-        fos.write(file.getBytes());
-        String path= String.valueOf(myFile.getAbsoluteFile());
-        fos.close();
-        employeeService.UploadEmployeeRegistration(path);
-        return  ResponseEntity.status(HttpStatus.OK).body("File Uploaded Successfully");
+        if(CignaConstantUtils.FILE_FORMAT.equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
+            FileOutputStream fos = null;
+            try {
+                File myFile = new File(FILE_DIRECTORY + file.getOriginalFilename());
+                myFile.createNewFile();
+                log.debug("File Created");
+                fos = new FileOutputStream(myFile);
+                fos.write(file.getBytes());
+                return ResponseEntity.status(HttpStatus.OK).body(employeeService.UploadEmployeeRegistration(myFile));
+            } catch (Exception e) {
+//                throw new ResourceNotFoundException(CignaConstantUtils.FILE_FORMAT_ERROR);
+            } finally {
+                fos.close();
+            }
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CignaConstantUtils.FILE_FORMAT_ERROR);
+        }
+
+        return null;
     }
     
     @GetMapping("/loadById/{empId}")
