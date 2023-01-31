@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.DataFormatException;
 
+import com.perficient.empmanagementsystem.exception.DuplicateEntryException;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -17,8 +19,8 @@ import org.springframework.stereotype.Service;
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
 import com.perficient.empmanagementsystem.exception.EmployeeNotFoundException;
-import com.perficient.empmanagementsystem.exception.inCorrectEmailErrorException;
-import com.perficient.empmanagementsystem.exception.loginPageErrorException;
+import com.perficient.empmanagementsystem.exception.InCorrectEmailException;
+import com.perficient.empmanagementsystem.exception.LoginPageErrorException;
 import com.perficient.empmanagementsystem.model.EmployeeAddress;
 import com.perficient.empmanagementsystem.model.Employee;
 import com.perficient.empmanagementsystem.repository.EmployeeRepository;
@@ -26,6 +28,7 @@ import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
+import static com.perficient.empmanagementsystem.exception.ErrorCodeEnum.EMP_ID_OR_PASSWORD_DUPLICATE;
 
 
 @Service
@@ -37,15 +40,16 @@ public class EmployeeServiceImpl implements EmployeeService{
     @Override
 
     public Employee employeeRegistration(EmployeeDTO employeeDTO) throws Exception{
-
         log.debug("[employeeRegistration] start service");
+		Employee employee =null;
+
         EmployeeAddress address = EmployeeAddress.builder()
 				.address(employeeDTO.getEmployeeAddress().getAddress())
                 .city(employeeDTO.getEmployeeAddress().getCity())
                 .state(employeeDTO.getEmployeeAddress().getState())
                 .zipcode(employeeDTO.getEmployeeAddress().getZipcode())
                 .build();
-        Employee employee=Employee.builder()
+         employee=Employee.builder()
                 .firstName(employeeDTO.getFirstName())
                 .lastName(employeeDTO.getLastName())
                 .email(employeeDTO.getEmail())
@@ -56,7 +60,14 @@ public class EmployeeServiceImpl implements EmployeeService{
                 .password(employeeDTO.getPassword())
                 .admin(employeeDTO.isAdmin())
                 .build();
-        return employeeRepository.save(employee);
+		 try {
+			 employeeRepository.save(employee);
+		 }catch (Exception e){
+			 String errorMessage = EMPLOYEE_EMAIL_EXIST;
+			 log.error(errorMessage);
+			 throw  new DuplicateEntryException(errorMessage);
+		 }
+        return employee;
     }
 
     
@@ -69,7 +80,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 	
 	
 	@Override
-	public String verifyLoginPage(LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException, loginPageErrorException{//passwordverification
+	public String verifyLoginPage(LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException {//passwordverification
 		
 		if(loginPageDTO.getEmail().isBlank()) 
 			return EMAIL_ID_CANNOT_BE_EMPTY;
@@ -78,15 +89,15 @@ public class EmployeeServiceImpl implements EmployeeService{
 		 if (loginPageDTO.getPassword().contentEquals(findByEmail(loginPageDTO)))
 			return USERNAME_AND_PASSWORD_MATCHES;
 			else	
-				throw new loginPageErrorException(PROVIDE_CORRECT_EMAIL_PASSWORD);
-		throw new inCorrectEmailErrorException(PROVIDE_CORRECT_EMAIL);
+				throw new LoginPageErrorException(PROVIDE_CORRECT_EMAIL_PASSWORD);
+		throw new InCorrectEmailException(PROVIDE_CORRECT_EMAIL);
 		
 		
 	}
 	
 	
 	@Override
-	public String findByEmail(LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException {//retreiving password from db for given email
+	public String findByEmail(LoginPageDTO loginPageDTO) throws InCorrectEmailException {//retreiving password from db for given email
 		if(findAllForEmail().contains(loginPageDTO.getEmail())) {
 		List<EmployeeDTO> value  = employeeRepository.findPasswordByEmail(loginPageDTO.getEmail()); 
 		Map<String,String> myMap = new  HashMap<String,String>();
@@ -96,7 +107,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 		
 		return Password;
 		}
-		throw new inCorrectEmailErrorException(GIVEN_EMAIL_DOES_NOT_PRESENT);
+		throw new InCorrectEmailException(GIVEN_EMAIL_DOES_NOT_PRESENT);
 		
 	}
 
@@ -137,7 +148,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 		log.debug("service loadById begin");
 		Employee employee = employeeRepository.findByEmpId(empId);
 		if(employee == null) {
-			throw new EmployeeNotFoundException();
+			throw new EmployeeNotFoundException(PROVIDE_CORRECT_ID);
 		} 
 		return employee;
 	}

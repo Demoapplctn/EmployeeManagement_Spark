@@ -25,8 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
 import com.perficient.empmanagementsystem.exception.EmployeeNotFoundException;
-import com.perficient.empmanagementsystem.exception.inCorrectEmailErrorException;
-import com.perficient.empmanagementsystem.exception.loginPageErrorException;
+import com.perficient.empmanagementsystem.exception.InCorrectEmailException;
+import com.perficient.empmanagementsystem.exception.LoginPageErrorException;
 import com.perficient.empmanagementsystem.model.Employee;
 import com.perficient.empmanagementsystem.service.EmployeeService;
 
@@ -54,7 +54,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/loginPageVerify")//verify the password
-    public ResponseEntity<String> loginPageVerify(@RequestBody LoginPageDTO loginPageDTO) throws inCorrectEmailErrorException, loginPageErrorException{
+    public ResponseEntity<String> loginPageVerify(@RequestBody LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException {
        return  ResponseEntity.status(HttpStatus.OK).body(employeeService.verifyLoginPage(loginPageDTO));
     }
  

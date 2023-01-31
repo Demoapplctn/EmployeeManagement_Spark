@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 import static com.perficient.empmanagementsystem.common.CignaConstantUtils.PROVIDE_EMAIL;
 import static com.perficient.empmanagementsystem.common.CignaConstantUtils.PROVIDE_PASSWORD;
 
@@ -18,11 +20,12 @@ import static com.perficient.empmanagementsystem.common.CignaConstantUtils.PROVI
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginPageDTO {
+public class LoginPageDTO implements Serializable {
+    private static final long serialVersionUID = -5633128091905628323L;
 
-	 	@NotNull(message = PROVIDE_EMAIL)
-	    private String email;
-	    @NotNull(message = PROVIDE_PASSWORD)
-	    private String password;
-	    
+    @NotNull(message = PROVIDE_EMAIL)
+    private String email;
+    @NotNull(message = PROVIDE_PASSWORD)
+    private String password;
+
 }

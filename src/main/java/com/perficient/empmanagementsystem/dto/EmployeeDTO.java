@@ -3,8 +3,11 @@ package com.perficient.empmanagementsystem.dto;
 import com.perficient.empmanagementsystem.model.EmployeeAddress;
 import lombok.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+
+import java.io.Serializable;
 
 import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
 
@@ -13,8 +16,8 @@ import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmployeeDTO {
-
+public class EmployeeDTO implements Serializable {
+    private static final long serialVersionUID = -4507215921695703300L;
     @NotNull(message = PROVIDE_EMP_ID)
 
     private Long empId;
@@ -27,6 +30,7 @@ public class EmployeeDTO {
     private String email;
     @NotNull
     private long contactNo;
+    @Valid
     @NotNull
     private EmployeeAddress employeeAddress;
 
