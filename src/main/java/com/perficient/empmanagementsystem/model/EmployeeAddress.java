@@ -7,8 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Address {
-
+public class EmployeeAddress {
+    private String address;
     private String city;
     private String state;
     private String zipcode;

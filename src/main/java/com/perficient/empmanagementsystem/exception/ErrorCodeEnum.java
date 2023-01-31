@@ -13,9 +13,7 @@ public enum ErrorCodeEnum {
 	INPUT_EMAIL_AND_PASSWORD_ERROR(PROVIDE_CORRECT_EMAIL_PASSWORD,-1003),
 	INPUT_EMPID_ERROR(PROVIDE_CORRECT_ID,-1002);
     private final List<String> messages;
-
     private final Integer code;
-
     ErrorCodeEnum(String msg, Integer code) {
         this.messages = Collections.singletonList(msg);
         this.code=code;

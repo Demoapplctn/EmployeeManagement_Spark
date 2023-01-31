@@ -9,7 +9,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddressDTO {
+public class EmployeeAddressDTO {
+
+    private String address;
 	@NotNull
     private String city;
 	@NotNull

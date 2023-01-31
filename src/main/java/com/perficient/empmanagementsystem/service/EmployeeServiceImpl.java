@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
-import com.perficient.empmanagementsystem.exception.ResourceNotFoundException;
+import com.perficient.empmanagementsystem.exception.EmployeeNotFoundException;
 import com.perficient.empmanagementsystem.exception.inCorrectEmailErrorException;
 import com.perficient.empmanagementsystem.exception.loginPageErrorException;
-import com.perficient.empmanagementsystem.model.Address;
+import com.perficient.empmanagementsystem.model.EmployeeAddress;
 import com.perficient.empmanagementsystem.model.Employee;
 import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 
@@ -39,10 +39,11 @@ public class EmployeeServiceImpl implements EmployeeService{
     public Employee employeeRegistration(EmployeeDTO employeeDTO) throws Exception{
 
         log.debug("[employeeRegistration] start service");
-        Address address =Address.builder()
-                .city(employeeDTO.getAddress().getCity())
-                .state(employeeDTO.getAddress().getState())
-                .zipcode(employeeDTO.getAddress().getZipcode())
+        EmployeeAddress address = EmployeeAddress.builder()
+				.address(employeeDTO.getEmployeeAddress().getAddress())
+                .city(employeeDTO.getEmployeeAddress().getCity())
+                .state(employeeDTO.getEmployeeAddress().getState())
+                .zipcode(employeeDTO.getEmployeeAddress().getZipcode())
                 .build();
         Employee employee=Employee.builder()
                 .firstName(employeeDTO.getFirstName())
@@ -51,7 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService{
                 .password(employeeDTO.getPassword())
                 .contactNo(employeeDTO.getContactNo())
                 .empId(employeeDTO.getEmpId())
-                .address(address)
+                .employeeAddress(address)
                 .password(employeeDTO.getPassword())
                 .admin(employeeDTO.isAdmin())
                 .build();
@@ -131,12 +132,12 @@ public class EmployeeServiceImpl implements EmployeeService{
         return "File Saved successfully";
     }
 
-
 	@Override
-	public Employee loadById(Long empId) throws ResourceNotFoundException {
+	public Employee loadById(Long empId) throws EmployeeNotFoundException {
+		log.debug("service loadById begin");
 		Employee employee = employeeRepository.findByEmpId(empId);
 		if(employee == null) {
-			throw new ResourceNotFoundException();
+			throw new EmployeeNotFoundException();
 		} 
 		return employee;
 	}

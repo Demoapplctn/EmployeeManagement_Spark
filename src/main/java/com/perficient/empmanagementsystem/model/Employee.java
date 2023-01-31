@@ -20,9 +20,8 @@ public class Employee {
     @Indexed(unique = true)
     private String email;
     private long contactNo;
-    private Address address;
+    private EmployeeAddress employeeAddress;
     private String password;
     private boolean admin;
-
 
 }
