@@ -9,7 +9,7 @@ import java.util.*;
 
 import com.opencsv.CSVReader;
 import com.perficient.empmanagementsystem.common.CignaConstantUtils;
-import com.perficient.empmanagementsystem.exception.DuplicateEntryException;
+import com.perficient.empmanagementsystem.exception.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
@@ -22,9 +22,6 @@ import org.springframework.stereotype.Service;
 
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
-import com.perficient.empmanagementsystem.exception.EmployeeNotFoundException;
-import com.perficient.empmanagementsystem.exception.InCorrectEmailException;
-import com.perficient.empmanagementsystem.exception.LoginPageErrorException;
 import com.perficient.empmanagementsystem.model.EmployeeAddress;
 import com.perficient.empmanagementsystem.model.Employee;
 import com.perficient.empmanagementsystem.repository.EmployeeRepository;
@@ -42,8 +39,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    @Override
 
+    @Override
     public Employee employeeRegistration(EmployeeDTO employeeDTO) throws Exception {
         log.debug("[employeeRegistration] start service");
         Employee employee = null;
@@ -135,32 +132,40 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public String UploadEmployeeRegistration(MultipartFile file) throws Exception {
-        File myFile = createFile(file);
-        if (validateFileHeader(myFile)) {
-            String path = String.valueOf(myFile.getAbsoluteFile());
-            SparkSession spark = SparkSession.builder().master("local[1]")
-                    .getOrCreate();
+    public String uploadEmployeeRegistration(MultipartFile file) throws Exception, EmptyFileException {
+        JavaSparkContext jsc = null;
+        try {
+            File myFile = createFile(file);
+            if (validateFileHeader(myFile)) {
+                String path = String.valueOf(myFile.getAbsoluteFile());
+                SparkSession spark = SparkSession.builder().master("local[1]").getOrCreate();
+                Dataset<Row> csv = spark.read().format("csv").option("header", "true").load(path);
 
-            Dataset<Row> csv = spark.read().format("csv").option("header", "true").load(path);
+                jsc = new JavaSparkContext(spark.sparkContext());
 
-            JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
+                csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource")
+                        .option("spark.mongodb.input.uri", "mongodb://127.0.0.1/")
+                        .option("spark.mongodb.output.uri", "mongodb://127.0.0.1/")
+                        .option("database", "EmployeeDB")
+                        .option("collection", "employee")
+                        .save();
+            } else {
+                return CignaConstantUtils.HEADER_MISMATCH;
+            }
 
-            csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource").option("spark.mongodb.input.uri", "mongodb://127.0.0.1/")
-                    .option("spark.mongodb.output.uri", "mongodb://127.0.0.1/")
-                    .option("database", "EmployeeDB")
-                    .option("collection", "Employee")
-                    .save();
+        } catch (Exception e) {
+
+        } finally {
+            if (jsc == null) {
+                throw new EmptyFileException(FILE_EMPTY);
+            }
             jsc.close();
-            return CignaConstantUtils.UPLOAD_SUCCESS_MESSAGE;
-        } else {
-            return CignaConstantUtils.HEADER_MISMATCH;
+
         }
-    
+        return CignaConstantUtils.UPLOAD_SUCCESS_MESSAGE;
     }
 
     private boolean validateFileHeader(File file) throws IOException {
-
         CSVReader reader = new CSVReader(new FileReader(file));
         String[] header = reader.readNext();
         List<String> headerList = new ArrayList<>();

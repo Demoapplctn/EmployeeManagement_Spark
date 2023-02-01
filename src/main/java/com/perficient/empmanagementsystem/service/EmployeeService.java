@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface EmployeeService {
 	public Employee employeeRegistration(EmployeeDTO employeeDTO)throws Exception;
-    public String UploadEmployeeRegistration(MultipartFile path) throws Exception;
+    public String uploadEmployeeRegistration(MultipartFile path) throws Exception;
     public String employeeRegistrationDeleteAll();//deleting all entries
     public String findByEmail(LoginPageDTO loginPageDTO) throws InCorrectEmailException;//finding password from database for already registered user
     public String verifyLoginPage(LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException;//Verifying password

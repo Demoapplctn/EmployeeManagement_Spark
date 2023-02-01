@@ -35,7 +35,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
     }
 
-    @Override
+  /*  @Override
     protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request)
     {
         ErrorDetails response=getFileErrorDetail(PROVIDE_FILE,ErrorCodeEnum.INPUT_PARAM_ERROR.getCode());
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .errorCode(enumErrorCode)
                 .errorMessage(Collections.singletonList(errorMessage))
                 .build();
-    }
+    }*/
 
 
 }
