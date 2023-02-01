@@ -41,48 +41,41 @@ import lombok.extern.slf4j.Slf4j;
 public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
-    @Value("${file.upload-dir}")
-    String FILE_DIRECTORY;
+
 
     @PostMapping(value = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Employee> employeeRegistration(@Valid @RequestBody EmployeeDTO employeeDTO)throws Exception{
+    public ResponseEntity<Employee> employeeRegistration(@Valid @RequestBody EmployeeDTO employeeDTO) throws Exception {
         log.debug("[employeeRegistration] Begin");
-        return  ResponseEntity.status(HttpStatus.CREATED).body(employeeService.employeeRegistration(employeeDTO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.employeeRegistration(employeeDTO));
     }
-    
+
     @DeleteMapping("/deleteAll")//delete all entries
-    public ResponseEntity<String> DeleteEmployeeRegistration(){
-        return  ResponseEntity.status(HttpStatus.OK).body(employeeService.employeeRegistrationDeleteAll());
+    public ResponseEntity<String> DeleteEmployeeRegistration() {
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.employeeRegistrationDeleteAll());
     }
 
     @PostMapping("/loginPageVerify")//verify the password
     public ResponseEntity<String> loginPageVerify(@RequestBody LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException {
-       return  ResponseEntity.status(HttpStatus.OK).body(employeeService.verifyLoginPage(loginPageDTO));
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.verifyLoginPage(loginPageDTO));
     }
 
     @PostMapping(value = "/uploadFile", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> fileUpload(@Valid @RequestParam MultipartFile file) throws Exception {
         log.debug("Uploading file Begin");
-        if(CignaConstantUtils.FILE_FORMAT.equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename())))
-        {
-            File myFile = new File(FILE_DIRECTORY + file.getOriginalFilename());
-            myFile.createNewFile();
-            log.debug("File Created");
-            FileOutputStream fos = new FileOutputStream(myFile);
-            fos.write(file.getBytes());
-            fos.close();
-            return ResponseEntity.status(HttpStatus.OK).body(employeeService.UploadEmployeeRegistration(myFile));
-        }
-        else {
+        if (!CignaConstantUtils.FILE_FORMAT.equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CignaConstantUtils.FILE_FORMAT_ERROR);
+        }else{
+            return ResponseEntity.status(HttpStatus.OK).body(employeeService.UploadEmployeeRegistration(file));
         }
+
+
     }
-    
+
     @GetMapping("/loadByEmail/{email}")
     public ResponseEntity<Employee> loadByEmail(@PathVariable String email) throws EmployeeNotFoundException {
         log.debug("loadByEmail Begin");
-		return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadByEmail(email));
-    	
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadByEmail(email));
+
     }
 
 }
