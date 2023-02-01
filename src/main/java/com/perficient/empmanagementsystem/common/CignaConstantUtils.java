@@ -22,4 +22,6 @@ public class CignaConstantUtils {
     public static final String FILE_FORMAT="CSV";
     public static final String FILE_FORMAT_ERROR="Please upload csv file to process";
     public static final String HEADER_MISMATCH="Headers mismatch";
+    public static final String FILE_EMPTY="File is empty";
+
 }
