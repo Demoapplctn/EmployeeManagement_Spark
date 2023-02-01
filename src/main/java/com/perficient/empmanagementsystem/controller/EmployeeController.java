@@ -70,6 +70,7 @@ public class EmployeeController {
             log.debug("File Created");
             FileOutputStream fos = new FileOutputStream(myFile);
             fos.write(file.getBytes());
+            fos.close();
             return ResponseEntity.status(HttpStatus.OK).body(employeeService.UploadEmployeeRegistration(myFile));
         }
         else {
