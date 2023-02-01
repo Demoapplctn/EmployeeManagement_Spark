@@ -28,6 +28,9 @@ public class HandledCustomException {
         }else if(ex instanceof  InCorrectEmailException){
             response = getErrorDetails(ex.getMessage(), ErrorCodeEnum.INPUT_EMAIL_ERROR.getCode());
         }
+        else if(ex instanceof EmptyFileException) {
+            response = getErrorDetails(ex.getMessage(), ErrorCodeEnum.FILE_CONTENT_IS_EMPTY.getCode());
+        }
         return response;
     }
 

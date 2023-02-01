@@ -5,8 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import com.perficient.empmanagementsystem.common.CignaConstantUtils;
+import com.perficient.empmanagementsystem.exception.EmptyFileException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,12 +62,15 @@ public class EmployeeController {
     }
 
     @PostMapping(value = "/uploadFile", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> fileUpload(@Valid @RequestParam MultipartFile file) throws Exception {
+    public ResponseEntity<Object> fileUpload(@RequestParam("File") MultipartFile file) throws Exception{
         log.debug("Uploading file Begin");
-        if (!CignaConstantUtils.FILE_FORMAT.equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
+        if(file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(CignaConstantUtils.PROVIDE_FILE);
+        }
+        else if (!CignaConstantUtils.FILE_FORMAT.equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CignaConstantUtils.FILE_FORMAT_ERROR);
-        }else{
-            return ResponseEntity.status(HttpStatus.OK).body(employeeService.UploadEmployeeRegistration(file));
+        }else {
+            return ResponseEntity.status(HttpStatus.OK).body(employeeService.uploadEmployeeRegistration(file));
         }
 
 
