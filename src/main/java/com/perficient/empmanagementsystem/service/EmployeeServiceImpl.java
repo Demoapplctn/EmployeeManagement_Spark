@@ -130,39 +130,35 @@ public class EmployeeServiceImpl implements EmployeeService {
         return result;
 
     }
-
+    @Value("${spring.data.mongodb.database}")
+    String DATABASE;
+    @Value("${spring.data.mongodb.collection}")
+    String COLLECTION;
+    @Value("${spring.data.mongodb.uri}")
+    String URI;
     @Override
-    public String uploadEmployeeRegistration(MultipartFile file) throws Exception, EmptyFileException {
-        JavaSparkContext jsc = null;
-        try {
-            File myFile = createFile(file);
-            if (validateFileHeader(myFile)) {
-                String path = String.valueOf(myFile.getAbsoluteFile());
-                SparkSession spark = SparkSession.builder().master("local[1]").getOrCreate();
-                Dataset<Row> csv = spark.read().format("csv").option("header", "true").load(path);
+    public String uploadEmployeeRegistration(MultipartFile file) throws Exception {
 
-                jsc = new JavaSparkContext(spark.sparkContext());
+        File myFile = createFile(file);
+        if (validateFileHeader(myFile)) {
+            String path = String.valueOf(myFile.getAbsoluteFile());
+            SparkSession spark = SparkSession.builder().master("local[1]").getOrCreate();
+            Dataset<Row> csv = spark.read().format("csv").option("header", "true").load(path);
 
-                csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource")
-                        .option("spark.mongodb.input.uri", "mongodb://127.0.0.1/")
-                        .option("spark.mongodb.output.uri", "mongodb://127.0.0.1/")
-                        .option("database", "EmployeeDB")
-                        .option("collection", "employee")
-                        .save();
-            } else {
-                return CignaConstantUtils.HEADER_MISMATCH;
-            }
+            JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
 
-        } catch (Exception e) {
-
-        } finally {
-            if (jsc == null) {
-                throw new EmptyFileException(FILE_EMPTY);
-            }
+            csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource")
+                    .option("spark.mongodb.input.uri", URI)
+                    .option("spark.mongodb.output.uri", URI)
+                    .option("database", DATABASE)
+                    .option("collection", COLLECTION)
+                    .save();
             jsc.close();
-
+            return CignaConstantUtils.UPLOAD_SUCCESS_MESSAGE;
+        } else {
+            return CignaConstantUtils.HEADER_MISMATCH;
         }
-        return CignaConstantUtils.UPLOAD_SUCCESS_MESSAGE;
+
     }
 
     private boolean validateFileHeader(File file) throws IOException {
@@ -238,13 +234,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-//    private boolean validateEmptyFile(File myFile) throws IOException {
-//        CSVReader reader = new CSVReader(new FileReader(myFile));
-//        String[] header = reader.readNext();
-//        if (header.)
-//            return false;
-//        else
-//            return true;
-//    }
 }
 
