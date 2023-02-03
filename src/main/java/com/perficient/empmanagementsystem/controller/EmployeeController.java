@@ -3,6 +3,7 @@ package com.perficient.empmanagementsystem.controller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
+import com.perficient.empmanagementsystem.dto.EmployeeResponseDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
 import com.perficient.empmanagementsystem.exception.EmployeeNotFoundException;
 import com.perficient.empmanagementsystem.exception.InCorrectEmailException;
@@ -81,6 +83,13 @@ public class EmployeeController {
         log.debug("loadByEmail Begin");
         return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadByEmail(email));
 
+    }
+    
+    @GetMapping("/getAllEmployee")
+    public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployee(){
+    	log.debug("loadByAllEmployee");
+		return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadAllEmployee());
+    	
     }
 
 }
