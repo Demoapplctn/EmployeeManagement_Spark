@@ -9,6 +9,7 @@ import java.util.*;
 
 import com.opencsv.CSVReader;
 import com.perficient.empmanagementsystem.common.CignaConstantUtils;
+import com.perficient.empmanagementsystem.dto.ResponseDTO;
 import com.perficient.empmanagementsystem.exception.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -137,14 +138,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Value("${spring.data.mongodb.uri}")
     String URI;
     @Override
-    public String uploadEmployeeRegistration(MultipartFile file) throws Exception {
-
+    public ResponseDTO uploadEmployeeRegistration(MultipartFile file) throws Exception {
+        ResponseDTO responseDTO=new ResponseDTO();
         File myFile = createFile(file);
+        int count=0;
         if (validateFileHeader(myFile)) {
             String path = String.valueOf(myFile.getAbsoluteFile());
             SparkSession spark = SparkSession.builder().master("local[1]").getOrCreate();
             Dataset<Row> csv = spark.read().format("csv").option("header", "true").load(path);
-
+            long longCount=csv.count();
             JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
 
             csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource")
@@ -154,9 +156,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                     .option("collection", COLLECTION)
                     .save();
             jsc.close();
-            return CignaConstantUtils.UPLOAD_SUCCESS_MESSAGE;
+            responseDTO.setCount((int) longCount);
+            responseDTO.setMessage(CignaConstantUtils.UPLOAD_SUCCESS_MESSAGE);
+            return responseDTO;
         } else {
-            return CignaConstantUtils.HEADER_MISMATCH;
+            responseDTO.setCount(count);
+            responseDTO.setMessage(CignaConstantUtils.HEADER_MISMATCH);
+            return responseDTO;
         }
 
     }
