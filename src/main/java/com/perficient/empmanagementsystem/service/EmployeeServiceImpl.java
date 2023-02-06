@@ -1,15 +1,6 @@
 package com.perficient.empmanagementsystem.service;
 
 
-import static com.perficient.empmanagementsystem.common.CignaConstantUtils.DELETE_ALL_RECORD;
-import static com.perficient.empmanagementsystem.common.CignaConstantUtils.EMAIL_ID_CANNOT_BE_EMPTY;
-import static com.perficient.empmanagementsystem.common.CignaConstantUtils.EMPLOYEE_EMAIL_EXIST;
-import static com.perficient.empmanagementsystem.common.CignaConstantUtils.GIVEN_EMAIL_DOES_NOT_PRESENT;
-import static com.perficient.empmanagementsystem.common.CignaConstantUtils.PROVIDE_CORRECT_EMAIL;
-import static com.perficient.empmanagementsystem.common.CignaConstantUtils.PROVIDE_CORRECT_EMAIL_PASSWORD;
-import static com.perficient.empmanagementsystem.common.CignaConstantUtils.PROVIDE_CORRECT_ID;
-import static com.perficient.empmanagementsystem.common.CignaConstantUtils.USERNAME_AND_PASSWORD_MATCHES;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -25,6 +16,7 @@ import com.perficient.empmanagementsystem.common.CignaConstantUtils;
 import com.perficient.empmanagementsystem.dto.ResponseDTO;
 import com.perficient.empmanagementsystem.exception.*;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.spark.SparkException;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -49,6 +41,8 @@ import com.perficient.empmanagementsystem.model.EmployeeAddress;
 import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 
 import lombok.extern.slf4j.Slf4j;
+
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
 
 @Service
 @Slf4j
@@ -164,13 +158,17 @@ public class EmployeeServiceImpl implements EmployeeService {
             Dataset<Row> csv = spark.read().format("csv").option("header", "true").load(path);
             long longCount=csv.count();
             JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
-
-            csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource")
-                    .option("spark.mongodb.input.uri", URI)
-                    .option("spark.mongodb.output.uri", URI)
-                    .option("database", DATABASE)
-                    .option("collection", COLLECTION)
-                    .save();
+try {
+    csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource")
+            .option("spark.mongodb.input.uri", URI)
+            .option("spark.mongodb.output.uri", URI)
+            .option("database", DATABASE)
+            .option("collection", COLLECTION)
+            .save();
+}
+catch(Exception e){
+    throw new SparkException("Duplicate key error collection");
+}
             jsc.close();
             responseDTO.setCount((int) longCount);
             responseDTO.setMessage(CignaConstantUtils.UPLOAD_SUCCESS_MESSAGE);
@@ -225,6 +223,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return employee;
     }
+
+    @Override
+    public String deleteByEmpId(Long empId) throws EmployeeNotFoundException {
+        log.debug("service deleteById begin");
+        if(employeeRepository.existsByEmpId(empId)){
+            employeeRepository.deleteByEmpId(empId);
+        }else{
+            throw new EmployeeNotFoundException(PROVIDE_CORRECT_ID);
+        }
+
+        return DELETE_EMPLOYEE;
+    }
+
+
 
     @Value("${file.upload-dir}")
     String FILE_DIRECTORY;
