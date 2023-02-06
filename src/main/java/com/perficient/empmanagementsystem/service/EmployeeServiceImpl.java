@@ -1,12 +1,25 @@
 package com.perficient.empmanagementsystem.service;
 
 
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.DELETE_ALL_RECORD;
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.EMAIL_ID_CANNOT_BE_EMPTY;
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.EMPLOYEE_EMAIL_EXIST;
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.GIVEN_EMAIL_DOES_NOT_PRESENT;
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.PROVIDE_CORRECT_EMAIL;
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.PROVIDE_CORRECT_EMAIL_PASSWORD;
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.PROVIDE_CORRECT_ID;
+import static com.perficient.empmanagementsystem.common.CignaConstantUtils.USERNAME_AND_PASSWORD_MATCHES;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import com.opencsv.CSVReader;
 import com.perficient.empmanagementsystem.common.CignaConstantUtils;
 import com.perficient.empmanagementsystem.dto.ResponseDTO;
@@ -20,18 +33,22 @@ import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.opencsv.CSVReader;
+import com.perficient.empmanagementsystem.common.CignaConstantUtils;
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
+import com.perficient.empmanagementsystem.dto.EmployeeResponseDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
-import com.perficient.empmanagementsystem.model.EmployeeAddress;
+import com.perficient.empmanagementsystem.exception.DuplicateEntryException;
+import com.perficient.empmanagementsystem.exception.EmployeeNotFoundException;
+import com.perficient.empmanagementsystem.exception.InCorrectEmailException;
+import com.perficient.empmanagementsystem.exception.LoginPageErrorException;
 import com.perficient.empmanagementsystem.model.Employee;
+import com.perficient.empmanagementsystem.model.EmployeeAddress;
 import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
-import scala.reflect.internal.ClassfileConstants;
-
-import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
 
 @Service
 @Slf4j
@@ -39,8 +56,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
-
-
+    
     @Override
     public Employee employeeRegistration(EmployeeDTO employeeDTO) throws Exception {
         log.debug("[employeeRegistration] start service");
@@ -239,6 +255,28 @@ public class EmployeeServiceImpl implements EmployeeService {
             return myFile;
         }
     }
+
+
+	@Override
+	public List<EmployeeResponseDTO> loadAllEmployee() {
+		return employeeRepository.findAll()
+								.stream()
+								.map(this::convertEntitytoDTO)
+								.collect(Collectors.toList());
+	
+	}
+	
+	private EmployeeResponseDTO convertEntitytoDTO(Employee employee) {
+		EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO();
+		employeeResponseDTO.setEmpId(employee.getEmpId());
+		employeeResponseDTO.setFirstName(employee.getFirstName());
+		employeeResponseDTO.setLastName(employee.getLastName());
+		employeeResponseDTO.setContactNo(employee.getContactNo());
+		employeeResponseDTO.setEmail(employee.getEmail());
+		employeeResponseDTO.setEmployeeAddress(employee.getEmployeeAddress());
+		return employeeResponseDTO;
+		
+	}
 
 }
 
