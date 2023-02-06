@@ -22,5 +22,5 @@ public interface EmployeeService {
     public List<String> findAllForEmail(LoginPageDTO loginPageDTO);//finding all email list
     public Employee loadByEmail(String email) throws EmployeeNotFoundException;
     public List<EmployeeResponseDTO> loadAllEmployee();
-
+    public String deleteByEmpId(Long empId);
 }

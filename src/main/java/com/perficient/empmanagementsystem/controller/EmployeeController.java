@@ -58,6 +58,12 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.OK).body(employeeService.employeeRegistrationDeleteAll());
     }
 
+    @DeleteMapping("/deleteById/{empId}")
+    public ResponseEntity<String> DeleteEmployeeByEmpID(@PathVariable("empId") Long empId)
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.deleteByEmpId(empId));
+    }
+
     @PostMapping("/loginPageVerify")//verify the password
     public ResponseEntity<String> loginPageVerify(@RequestBody LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException {
         return ResponseEntity.status(HttpStatus.OK).body(employeeService.verifyLoginPage(loginPageDTO));
