@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ResponseDTO {
+public class FileUploadResponseDTO {
     private int count;
     private String message;
 
