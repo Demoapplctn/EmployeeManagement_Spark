@@ -1,18 +1,11 @@
 package com.perficient.empmanagementsystem.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import com.perficient.empmanagementsystem.common.CignaConstantUtils;
-import com.perficient.empmanagementsystem.exception.EmptyFileException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +39,6 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-
     @PostMapping(value = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> employeeRegistration(@Valid @RequestBody EmployeeDTO employeeDTO) throws Exception {
         log.debug("[employeeRegistration] Begin");
@@ -55,23 +47,28 @@ public class EmployeeController {
 
     @DeleteMapping("/deleteAll")//delete all entries
     public ResponseEntity<String> DeleteEmployeeRegistration() {
+        log.debug("[DeleteEmployeeRegistration] Begin");
+
         return ResponseEntity.status(HttpStatus.OK).body(employeeService.employeeRegistrationDeleteAll());
     }
 
     @DeleteMapping("/deleteById/{empId}")
-    public ResponseEntity<String> DeleteEmployeeByEmpID(@PathVariable("empId") Long empId)
-    {
+    public ResponseEntity<String> DeleteEmployeeByEmpID(@PathVariable("empId") Long empId){
+        log.debug("[DeleteEmployeeByEmpID] Begin");
+
         return ResponseEntity.status(HttpStatus.OK).body(employeeService.deleteByEmpId(empId));
     }
 
     @PostMapping("/loginPageVerify")//verify the password
     public ResponseEntity<String> loginPageVerify(@RequestBody LoginPageDTO loginPageDTO) throws InCorrectEmailException, LoginPageErrorException {
+        log.debug("[loginPageVerify] Begin");
+
         return ResponseEntity.status(HttpStatus.OK).body(employeeService.verifyLoginPage(loginPageDTO));
     }
 
     @PostMapping(value = "/uploadFile", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> fileUpload(@RequestParam("File") MultipartFile file) throws Exception{
-        log.debug("Uploading file Begin");
+        log.debug("[fileUpload] Begin");
         if(file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(CignaConstantUtils.PROVIDE_FILE);
         }
@@ -80,7 +77,6 @@ public class EmployeeController {
         }else {
             return ResponseEntity.status(HttpStatus.OK).body(employeeService.uploadEmployeeRegistration(file));
         }
-
 
     }
 
