@@ -5,11 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.*;
 import java.util.stream.Collectors;
 import com.opencsv.CSVReader;
 import com.perficient.empmanagementsystem.common.CignaConstantUtils;
@@ -23,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.opencsv.CSVReader;
-import com.perficient.empmanagementsystem.common.CignaConstantUtils;
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
 import com.perficient.empmanagementsystem.dto.EmployeeResponseDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
@@ -37,16 +32,13 @@ import com.perficient.empmanagementsystem.model.EmployeeAddress;
 import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
 import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
 
 @Service
 @Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
-
     @Autowired
     private EmployeeRepository employeeRepository;
-
     @Value("${spring.data.mongodb.database}")
     String DATABASE;
     @Value("${spring.data.mongodb.collection}")
@@ -60,8 +52,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee employeeRegistration(EmployeeDTO employeeDTO) throws Exception {
-        log.debug("[employeeRegistration] start service");
+        log.debug("[employeeRegistration] service Begin");
         Employee employee = null;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         EmployeeAddress address = EmployeeAddress.builder()
                 .address(employeeDTO.getEmployeeAddress().getAddress())
@@ -79,6 +72,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employeeAddress(address)
                 .password(employeeDTO.getPassword())
                 .admin(employeeDTO.isAdmin())
+                .createDt(timestamp)
                 .build();
         try {
             employeeRepository.save(employee);
@@ -93,6 +87,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public String employeeRegistrationDeleteAll() {//deleteall
+        log.debug("[employeeRegistrationDeleteAll] service Begin");
+
         employeeRepository.deleteAll();
         return DELETE_ALL_RECORD;
     }
@@ -134,6 +130,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<String> findAllForEmail(LoginPageDTO loginPageDTO) {
+        log.debug("[findAllForEmail] service Begin");
 
         String firstLetter = loginPageDTO.getEmail().substring(0, 1);
 
@@ -151,6 +148,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public FileUploadResponseDTO uploadEmployeeRegistration(MultipartFile file) throws Exception {
+        log.debug("[uploadEmployeeRegistration] service Begin");
+
         FileUploadResponseDTO responseDTO = new FileUploadResponseDTO();
         File myFile = createFile(file);
         int count = 0;
@@ -220,7 +219,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee loadByEmail(String email) throws EmployeeNotFoundException {
-        log.debug("service loadById begin");
+        log.debug("[loadByEmail] service begin");
         Employee employee = employeeRepository.findByEmail(email);
         if (employee == null) {
             throw new EmployeeNotFoundException(PROVIDE_CORRECT_ID);
@@ -230,7 +229,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public String deleteByEmpId(Long empId) throws EmployeeNotFoundException {
-        log.debug("service deleteById begin");
+        log.debug("[deleteById] service begin");
         if(employeeRepository.existsByEmpId(empId)){
             employeeRepository.deleteByEmpId(empId);
         }else{
@@ -268,14 +267,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public List<EmployeeResponseDTO> loadAllEmployee() {
+        log.debug("[loadAllEmployee] service begin");
+
 		return employeeRepository.findAll()
 								.stream()
-								.map(this::convertEntitytoDTO)
+								.map(this::convertEntityToDTO)
 								.collect(Collectors.toList());
 	
 	}
 	
-	private EmployeeResponseDTO convertEntitytoDTO(Employee employee) {
+	private EmployeeResponseDTO convertEntityToDTO(Employee employee) {
 		EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO();
 		employeeResponseDTO.setEmpId(employee.getEmpId());
 		employeeResponseDTO.setFirstName(employee.getFirstName());

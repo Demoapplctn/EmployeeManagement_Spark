@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -26,5 +28,6 @@ public class Employee implements Serializable {
     private EmployeeAddress employeeAddress;
     private String password;
     private boolean admin;
+    private Timestamp createDt;
 
 }
