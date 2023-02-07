@@ -9,9 +9,8 @@ import java.util.*;
 
 import com.opencsv.CSVReader;
 import com.perficient.empmanagementsystem.common.CignaConstantUtils;
-import com.perficient.empmanagementsystem.dto.ResponseDTO;
+import com.perficient.empmanagementsystem.dto.FileUploadResponseDTO;
 import com.perficient.empmanagementsystem.exception.*;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -29,7 +28,6 @@ import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
-import scala.reflect.internal.ClassfileConstants;
 
 import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
 
@@ -40,6 +38,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    @Value("${spring.data.mongodb.database}")
+    String DATABASE;
+    @Value("${spring.data.mongodb.collection}")
+    String COLLECTION;
+    @Value("${spring.data.mongodb.uri}")
+    String URI;
+    @Value("${file.upload-dir}")
+    String FILE_DIRECTORY;
+    @Value("${file.upload-dir-new}")
+    String FILE_PATH;
 
     @Override
     public Employee employeeRegistration(EmployeeDTO employeeDTO) throws Exception {
@@ -131,31 +139,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         return result;
 
     }
-    @Value("${spring.data.mongodb.database}")
-    String DATABASE;
-    @Value("${spring.data.mongodb.collection}")
-    String COLLECTION;
-    @Value("${spring.data.mongodb.uri}")
-    String URI;
+
     @Override
-    public ResponseDTO uploadEmployeeRegistration(MultipartFile file) throws Exception {
-        ResponseDTO responseDTO=new ResponseDTO();
+    public FileUploadResponseDTO uploadEmployeeRegistration(MultipartFile file) throws Exception {
+        FileUploadResponseDTO responseDTO = new FileUploadResponseDTO();
         File myFile = createFile(file);
-        int count=0;
+        int count = 0;
         if (validateFileHeader(myFile)) {
             String path = String.valueOf(myFile.getAbsoluteFile());
             SparkSession spark = SparkSession.builder().master("local[1]").getOrCreate();
             Dataset<Row> csv = spark.read().format("csv").option("header", "true").load(path);
-            long longCount=csv.count();
+            long longCount = csv.count();
             JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
-
-            csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource")
-                    .option("spark.mongodb.input.uri", URI)
-                    .option("spark.mongodb.output.uri", URI)
-                    .option("database", DATABASE)
-                    .option("collection", COLLECTION)
-                    .save();
-            jsc.close();
+            try {
+                csv.write().mode(SaveMode.Append).format("com.mongodb.spark.sql.DefaultSource")
+                        .option("spark.mongodb.input.uri", URI)
+                        .option("spark.mongodb.output.uri", URI)
+                        .option("database", DATABASE)
+                        .option("collection", COLLECTION)
+                        .save();
+            } catch (Exception e) {
+                String errorMessage = EMPLOYEE_EMAIL_EXIST;
+                log.error(errorMessage);
+                throw new DuplicateEntryException(errorMessage);
+            } finally {
+                jsc.close();
+            }
             responseDTO.setCount((int) longCount);
             responseDTO.setMessage(CignaConstantUtils.UPLOAD_SUCCESS_MESSAGE);
             return responseDTO;
@@ -209,11 +218,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return employee;
     }
-
-    @Value("${file.upload-dir}")
-    String FILE_DIRECTORY;
-    @Value("${file.upload-dir-new}")
-    String FILE_PATH;
 
     public File createFile(MultipartFile file) throws Exception {
 
