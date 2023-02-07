@@ -5,12 +5,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import com.opencsv.CSVReader;
 import com.perficient.empmanagementsystem.common.CignaConstantUtils;
 import com.perficient.empmanagementsystem.dto.FileUploadResponseDTO;
-import com.perficient.empmanagementsystem.exception.*;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -19,16 +22,22 @@ import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.multipart.MultipartFile;
+import com.opencsv.CSVReader;
+import com.perficient.empmanagementsystem.common.CignaConstantUtils;
 import com.perficient.empmanagementsystem.dto.EmployeeDTO;
+import com.perficient.empmanagementsystem.dto.EmployeeResponseDTO;
 import com.perficient.empmanagementsystem.dto.LoginPageDTO;
-import com.perficient.empmanagementsystem.model.EmployeeAddress;
+import com.perficient.empmanagementsystem.exception.DuplicateEntryException;
+import com.perficient.empmanagementsystem.exception.EmployeeNotFoundException;
+import com.perficient.empmanagementsystem.exception.InCorrectEmailException;
+import com.perficient.empmanagementsystem.exception.LoginPageErrorException;
 import com.perficient.empmanagementsystem.model.Employee;
+import com.perficient.empmanagementsystem.model.EmployeeAddress;
 import com.perficient.empmanagementsystem.repository.EmployeeRepository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
-
 import static com.perficient.empmanagementsystem.common.CignaConstantUtils.*;
 
 @Service
@@ -219,6 +228,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
+    @Override
+    public String deleteByEmpId(Long empId) throws EmployeeNotFoundException {
+        log.debug("service deleteById begin");
+        if(employeeRepository.existsByEmpId(empId)){
+            employeeRepository.deleteByEmpId(empId);
+        }else{
+            throw new EmployeeNotFoundException(PROVIDE_CORRECT_ID);
+        }
+
+        return DELETE_EMPLOYEE;
+    }
+
     public File createFile(MultipartFile file) throws Exception {
 
         String username = System.getProperty("user.name");
@@ -243,6 +264,28 @@ public class EmployeeServiceImpl implements EmployeeService {
             return myFile;
         }
     }
+
+
+	@Override
+	public List<EmployeeResponseDTO> loadAllEmployee() {
+		return employeeRepository.findAll()
+								.stream()
+								.map(this::convertEntitytoDTO)
+								.collect(Collectors.toList());
+	
+	}
+	
+	private EmployeeResponseDTO convertEntitytoDTO(Employee employee) {
+		EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO();
+		employeeResponseDTO.setEmpId(employee.getEmpId());
+		employeeResponseDTO.setFirstName(employee.getFirstName());
+		employeeResponseDTO.setLastName(employee.getLastName());
+		employeeResponseDTO.setContactNo(employee.getContactNo());
+		employeeResponseDTO.setEmail(employee.getEmail());
+		employeeResponseDTO.setEmployeeAddress(employee.getEmployeeAddress());
+		return employeeResponseDTO;
+		
+	}
 
 }
 

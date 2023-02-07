@@ -18,5 +18,8 @@ public interface EmployeeRepository extends MongoRepository<Employee, Long> {
 	
 	Employee findByEmail(String email);
 
-	
+
+	String deleteByEmpId(Long empId);
+
+	boolean existsByEmpId(Long empId);
 }
