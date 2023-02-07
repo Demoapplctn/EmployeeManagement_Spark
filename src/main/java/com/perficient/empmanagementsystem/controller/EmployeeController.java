@@ -75,7 +75,7 @@ public class EmployeeController {
         else if (!CignaConstantUtils.FILE_FORMAT.equalsIgnoreCase(FilenameUtils.getExtension(file.getOriginalFilename()))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CignaConstantUtils.FILE_FORMAT_ERROR);
         }else {
-            return ResponseEntity.status(HttpStatus.OK).body(employeeService.uploadEmployeeRegistration(file));
+            return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.uploadEmployeeRegistration(file));
         }
 
     }
@@ -83,14 +83,14 @@ public class EmployeeController {
     @GetMapping("/loadByEmail/{email}")
     public ResponseEntity<Employee> loadByEmail(@PathVariable String email) throws EmployeeNotFoundException {
         log.debug("loadByEmail Begin");
-        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadByEmail(email));
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.loadByEmail(email));
 
     }
     
     @GetMapping("/getAllEmployee")
     public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployee(){
     	log.debug("loadByAllEmployee");
-		return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.loadAllEmployee());
+		return ResponseEntity.status(HttpStatus.OK).body(employeeService.loadAllEmployee());
     	
     }
 
