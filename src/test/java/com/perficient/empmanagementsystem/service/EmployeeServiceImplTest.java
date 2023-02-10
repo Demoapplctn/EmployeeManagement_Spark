@@ -274,10 +274,7 @@ private Employee getEmployeeDetails_PasswordDifferent() {
 		
 		ObjectMapper mapper = new ObjectMapper();
 		EmployeeDTO employeeDTO = mapper.readValue(response, EmployeeDTO.class);
-		return employeeDTO;
-		
-		
-		
+		return employeeDTO;	
 	}
 	
 private EmployeeDTO getEmployeeDTODetails_PasswordDifferent() throws JsonMappingException, JsonProcessingException {
@@ -302,9 +299,6 @@ private EmployeeDTO getEmployeeDTODetails_PasswordDifferent() throws JsonMapping
 		ObjectMapper mapper = new ObjectMapper();
 		EmployeeDTO employeeDTO = mapper.readValue(response, EmployeeDTO.class);
 		return employeeDTO;
-		
-		
-		
 	}
 	
 }
